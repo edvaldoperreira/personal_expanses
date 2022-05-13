@@ -10,50 +10,55 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: transactions.map((e) {
-        return Card(
-          child: Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.black,
-                  width: 2,
-                )),
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  '$_currencySymbol ${e.value.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.purple),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(e.title,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold)),
-                  Text(
-                    DateFormat('d MMM y').format(e.date),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
+    return SizedBox(
+      height: 280,
+      child: ListView.builder(
+        itemCount: transactions.length,
+        itemBuilder: (ctx, index) {
+          final item = transactions[index];
+          return Card(
+            child: Row(
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 10,
                   ),
-                ],
-              )
-            ],
-          ),
-        );
-      }).toList(),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    color: Colors.black,
+                    width: 2,
+                  )),
+                  padding: const EdgeInsets.all(10),
+                  child: Text(
+                    '$_currencySymbol ${item.value.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.purple),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.title,
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold)),
+                    Text(
+                      DateFormat('d MMM y').format(item.date),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

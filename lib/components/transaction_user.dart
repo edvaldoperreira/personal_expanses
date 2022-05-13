@@ -35,15 +35,9 @@ class _TransactionUserState extends State<TransactionUser> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Card(
-          color: Colors.blue,
-          child: Text('Graph'),
-          elevation: 5,
-        ),
-        TransactionList(_transaction),
         TransactionForm(_addTransaction),
+        TransactionList(_transaction),
       ],
     );
   }
