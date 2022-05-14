@@ -12,51 +12,52 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 500,
-      child: ListView.builder(
-        itemCount: transactions.length,
-        itemBuilder: (ctx, index) {
-          final item = transactions[index];
-          return Card(
-            child: Row(
+      child: transactions.isEmpty
+          ? Column(
               children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                    color: Theme.of(context).primaryColor,
-                    width: 2,
-                  )),
-                  padding: const EdgeInsets.all(10),
-                  child: Text(
-                    '$_currencySymbol ${item.value.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                Text(
+                  'There is no transactions',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SizedBox(
+                  height: 200,
+                  child: Image.asset(
+                    'assets/images/wait.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item.title,
-                        style: ThemeData.light().textTheme.titleMedium),
-                    Text(
-                      DateFormat('d MMM y').format(item.date),
-                      style: const TextStyle(
-                        color: Colors.grey,
+              ],
+            )
+          : ListView.builder(
+              itemCount: transactions.length,
+              itemBuilder: (ctx, index) {
+                final item = transactions[index];
+                return Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: FittedBox(
+                          child: Text(
+                              '$_currencySymbol ${item.value.toStringAsFixed(2)}'),
+                        ),
                       ),
                     ),
-                  ],
-                )
-              ],
+                    title: Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    subtitle: Text(
+                      DateFormat('d MMM y').format(item.date),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }

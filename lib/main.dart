@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:personal_expenses/components/chart.dart';
 import 'package:personal_expenses/components/transaction_form.dart';
 
 import 'components/transaction_list.dart';
@@ -37,11 +38,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _transaction = [
-    Transaction('1', 'Ice cream', 10.0, DateTime.now()),
-    Transaction('2', 'Bakery', 5.25, DateTime.now()),
-    Transaction('3', 'Grocery', 100.84, DateTime.now()),
-    Transaction('4', 'Thearer', 40.0, DateTime.now()),
+  final List<Transaction> _transactions = [
+    Transaction(
+        '1', 'Ice cream', 10.0, DateTime.now().subtract(Duration(days: 1))),
+    Transaction(
+        '2', 'Bakery', 5.25, DateTime.now().subtract(Duration(days: 2))),
+    Transaction(
+        '3', 'Grocery', 100.84, DateTime.now().subtract(Duration(days: 3))),
+    Transaction(
+        '4', 'Thearer', 40.0, DateTime.now().subtract(Duration(days: 4))),
+    Transaction(
+        '5', 'Food', 400.0, DateTime.now().subtract(Duration(days: 50))),
   ];
 
   _addTransaction(String title, double value) {
@@ -53,11 +60,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     setState(() {
-      _transaction.add(newTransaction);
+      _transactions.add(newTransaction);
     });
 
     //Close modal
     Navigator.of(context).pop();
+  }
+
+  List<Transaction> get _recentTransactions {
+    return _transactions.where((element) {
+      return element.date.isAfter(DateTime.now().subtract(
+        Duration(days: 7),
+      ));
+    }).toList();
   }
 
   _openTransactionFormModal(BuildContext context) {
@@ -86,14 +101,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Card(
-              color: Colors.blue,
-              child: Text('Graph'),
-              elevation: 5,
-            ),
+            Chart(_recentTransactions),
             Column(
               children: [
-                TransactionList(_transaction),
+                TransactionList(_transactions),
               ],
             )
           ],
