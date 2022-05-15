@@ -38,25 +38,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _transactions = [
-    Transaction(
-        '1', 'Ice cream', 10.0, DateTime.now().subtract(Duration(days: 1))),
-    Transaction(
-        '2', 'Bakery', 5.25, DateTime.now().subtract(Duration(days: 2))),
-    Transaction(
-        '3', 'Grocery', 100.84, DateTime.now().subtract(Duration(days: 3))),
-    Transaction(
-        '4', 'Thearer', 40.0, DateTime.now().subtract(Duration(days: 4))),
-    Transaction(
-        '5', 'Food', 400.0, DateTime.now().subtract(Duration(days: 50))),
-  ];
+  final List<Transaction> _transactions = [];
 
-  _addTransaction(String title, double value) {
+  _addTransaction(String title, double value, DateTime date) {
     final newTransaction = Transaction(
       Random().nextDouble().toString(),
       title,
       value,
-      DateTime.now(),
+      date,
     );
 
     setState(() {
@@ -65,6 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //Close modal
     Navigator.of(context).pop();
+  }
+
+  _removeTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere((element) => element.id == id);
+    });
   }
 
   List<Transaction> get _recentTransactions {
@@ -104,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Chart(_recentTransactions),
             Column(
               children: [
-                TransactionList(_transactions),
+                TransactionList(_transactions, _removeTransaction),
               ],
             )
           ],

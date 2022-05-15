@@ -9,19 +9,17 @@ class Chart extends StatelessWidget {
   Chart(this.recentTransactions);
 
   List<Map<String, Object>> get groupTransaction {
+    if (recentTransactions.isEmpty) return [];
     return List.generate(7, (index) {
       final weekDay = DateTime.now().subtract(
         Duration(days: index),
       );
 
       double totalSum = 0;
-      for (var i = 0; i < recentTransactions.length; i++) {
-        bool sameDay = recentTransactions[i].date.day == weekDay.day;
-        bool sameMonth = recentTransactions[i].date.month == weekDay.month;
-        bool sameYear = recentTransactions[i].date.year == weekDay.year;
-
-        if (sameDay && sameMonth && sameYear) {
-          totalSum += recentTransactions[i].value;
+      for (var element in recentTransactions) {
+        if (DateFormat('d/MM/y').format(weekDay) ==
+            DateFormat('d/MM/y').format(element.date)) {
+          totalSum += element.value;
         }
       }
 
@@ -29,34 +27,35 @@ class Chart extends StatelessWidget {
         'day': DateFormat.E().format(weekDay).substring(0, 3).toUpperCase(),
         'value': totalSum
       };
-    });
+    }).reversed.toList();
   }
 
   double get totalRecentTransaction {
-    double total = 0;
-    groupTransaction.forEach((element) => total += element['value'] as double);
-    return total;
+    return groupTransaction.fold(0.0, (sum, tr) {
+      return sum + (tr['value'] as double);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    groupTransaction;
-    return Card(
-      elevation: 6,
-      margin: EdgeInsets.all(20),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: groupTransaction.map((e) {
-            return Flexible(
-              fit: FlexFit.tight,
-              child: ChartBar(totalRecentTransaction, e['value'] as double,
-                  e['day'] as String),
-            );
-          }).toList(),
-        ),
-      ),
-    );
+    return recentTransactions.isNotEmpty
+        ? Card(
+            elevation: 6,
+            margin: const EdgeInsets.all(20),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: groupTransaction.map((e) {
+                  return Flexible(
+                    fit: FlexFit.tight,
+                    child: ChartBar(totalRecentTransaction,
+                        e['value'] as double, e['day'] as String),
+                  );
+                }).toList(),
+              ),
+            ),
+          )
+        : const Padding(padding: EdgeInsets.only(top: 20));
   }
 }

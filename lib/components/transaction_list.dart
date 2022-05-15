@@ -5,25 +5,30 @@ import 'package:personal_expenses/models/transaction.dart';
 class TransactionList extends StatelessWidget {
   final _currencySymbol = '€';
   final List<Transaction> transactions;
+  final void Function(String) onRemove;
 
-  TransactionList(this.transactions);
+  TransactionList(this.transactions, this.onRemove);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 500,
+      height: 330,
       child: transactions.isEmpty
           ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'There is no transactions',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                SizedBox(
-                  height: 200,
-                  child: Image.asset(
-                    'assets/images/wait.png',
-                    fit: BoxFit.cover,
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                    height: 200,
+                    child: Image.asset(
+                      'assets/images/wait.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ],
@@ -53,6 +58,11 @@ class TransactionList extends StatelessWidget {
                     ),
                     subtitle: Text(
                       DateFormat('d MMM y').format(item.date),
+                    ),
+                    trailing: IconButton(
+                      onPressed: () => onRemove(item.id),
+                      icon: const Icon(Icons.delete_forever),
+                      color: Colors.red[400],
                     ),
                   ),
                 );
