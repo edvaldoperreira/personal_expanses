@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:personal_expenses/components/chart.dart';
 import 'package:personal_expenses/components/transaction_form.dart';
 
@@ -14,6 +15,11 @@ class PersonalExpensesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //To define suported orientations
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeLeft,
+    // ]);
+
     return MaterialApp(
       home: MyHomePage(),
       theme: ThemeData(
@@ -39,6 +45,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
+  bool _showChart = false;
 
   _addTransaction(String title, double value, DateTime date) {
     final newTransaction = Transaction(
@@ -82,9 +89,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
     final appBar = AppBar(
       title: const Text('Personal Expenses'),
       actions: [
+        if (isLandscape)
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _showChart = !_showChart;
+              });
+            },
+            icon: _showChart
+                ? const Icon(Icons.bar_chart)
+                : const Icon(Icons.list),
+          ),
         IconButton(
           onPressed: () => _openTransactionFormModal(context),
           icon: const Icon(Icons.add),
@@ -102,14 +123,40 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: availableHeight * 0.35,
-              child: Chart(_recentTransactions),
-            ),
-            SizedBox(
-              height: availableHeight * 0.65,
-              child: TransactionList(_transactions, _removeTransaction),
-            ),
+            if (!isLandscape || _showChart)
+              SizedBox(
+                height: availableHeight * (isLandscape ? 1 : 0.35),
+                child: Chart(_recentTransactions),
+              ),
+            if (!isLandscape || !_showChart)
+              _transactions.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            'There is no transaction',
+                            style: TextStyle(
+                                fontSize: 15 *
+                                    MediaQuery.of(context).textScaleFactor),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              height: 200,
+                              child: Image.asset(
+                                'assets/images/wait.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : SizedBox(
+                      height: availableHeight * (isLandscape ? 1 : 0.65),
+                      child: TransactionList(_transactions, _removeTransaction),
+                    ),
           ],
         ),
       ),

@@ -9,7 +9,6 @@ class Chart extends StatelessWidget {
   Chart(this.recentTransactions);
 
   List<Map<String, Object>> get groupTransaction {
-    if (recentTransactions.isEmpty) return [];
     return List.generate(7, (index) {
       final weekDay = DateTime.now().subtract(
         Duration(days: index),
@@ -22,7 +21,6 @@ class Chart extends StatelessWidget {
           totalSum += element.value;
         }
       }
-
       return {
         'day': DateFormat.E().format(weekDay).substring(0, 3).toUpperCase(),
         'value': totalSum
@@ -38,24 +36,22 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return recentTransactions.isNotEmpty
-        ? Card(
-            elevation: 6,
-            margin: const EdgeInsets.all(20),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: groupTransaction.map((e) {
-                  return Flexible(
-                    fit: FlexFit.tight,
-                    child: ChartBar(totalRecentTransaction,
-                        e['value'] as double, e['day'] as String),
-                  );
-                }).toList(),
-              ),
-            ),
-          )
-        : const Padding(padding: EdgeInsets.only(top: 20));
+    return Card(
+      elevation: 6,
+      margin: const EdgeInsets.all(20),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: groupTransaction.map((e) {
+            return Flexible(
+              fit: FlexFit.tight,
+              child: ChartBar(totalRecentTransaction, e['value'] as double,
+                  e['day'] as String),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 }
