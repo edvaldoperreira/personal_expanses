@@ -11,63 +11,59 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 330,
-      child: transactions.isEmpty
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'There is no transactions',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: SizedBox(
-                    height: 200,
-                    child: Image.asset(
-                      'assets/images/wait.png',
-                      fit: BoxFit.cover,
-                    ),
+    return transactions.isEmpty
+        ? Column(
+            children: [
+              Text(
+                'There is no transactions',
+                style: TextStyle(
+                    fontSize: 20 * MediaQuery.of(context).textScaleFactor),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                  height: 200,
+                  child: Image.asset(
+                    'assets/images/wait.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            )
-          : ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (ctx, index) {
-                final item = transactions[index];
-                return Card(
-                  elevation: 5,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: FittedBox(
-                          child: Text(
-                              '$_currencySymbol ${item.value.toStringAsFixed(2)}'),
-                        ),
+              ),
+            ],
+          )
+        : ListView.builder(
+            itemCount: transactions.length,
+            itemBuilder: (ctx, index) {
+              final item = transactions[index];
+              return Card(
+                elevation: 5,
+                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: FittedBox(
+                        child: Text(
+                            '$_currencySymbol ${item.value.toStringAsFixed(2)}'),
                       ),
                     ),
-                    title: Text(
-                      item.title,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    subtitle: Text(
-                      DateFormat('d MMM y').format(item.date),
-                    ),
-                    trailing: IconButton(
-                      onPressed: () => onRemove(item.id),
-                      icon: const Icon(Icons.delete_forever),
-                      color: Colors.red[400],
-                    ),
                   ),
-                );
-              },
-            ),
-    );
+                  title: Text(
+                    item.title,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  subtitle: Text(
+                    DateFormat('d MMM y').format(item.date),
+                  ),
+                  trailing: IconButton(
+                    onPressed: () => onRemove(item.id),
+                    icon: const Icon(Icons.delete_forever),
+                    color: Colors.red[400],
+                  ),
+                ),
+              );
+            },
+          );
   }
 }
