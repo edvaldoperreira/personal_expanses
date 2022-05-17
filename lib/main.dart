@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:personal_expenses/components/chart.dart';
 import 'package:personal_expenses/components/transaction_form.dart';
 
@@ -87,82 +88,108 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _getIconButton(IconData icon, Function() fn) {
+    return Platform.isIOS
+        ? GestureDetector(onTap: fn, child: Icon(icon))
+        : IconButton(icon: Icon(icon), onPressed: fn);
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     bool isLandscape = mediaQuery.orientation == Orientation.landscape;
 
-    final appBar = AppBar(
-      title: const Text('Personal Expenses'),
-      actions: [
-        if (isLandscape)
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showChart = !_showChart;
-              });
-            },
-            icon: _showChart
-                ? const Icon(Icons.bar_chart)
-                : const Icon(Icons.list),
-          ),
-        IconButton(
-          onPressed: () => _openTransactionFormModal(context),
-          icon: const Icon(Icons.add),
-        ),
-      ],
-    );
+    final iconList = Platform.isIOS ? CupertinoIcons.list_bullet : Icons.list;
+    final iconChart =
+        Platform.isIOS ? CupertinoIcons.chart_bar : Icons.bar_chart;
+    final iconAdd = Platform.isIOS ? CupertinoIcons.add : Icons.add;
+
+    final actions = <Widget>[
+      if (isLandscape)
+        _getIconButton(_showChart ? iconChart : iconList, () {
+          setState(() {
+            _showChart = !_showChart;
+          });
+        }),
+      _getIconButton(
+        iconAdd,
+        () => _openTransactionFormModal(context),
+      ),
+    ];
+
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: const Text('Personal Expenses'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: actions,
+            ),
+          ) as PreferredSizeWidget
+        : AppBar(
+            title: const Text('Personal Expenses'),
+            actions: actions,
+          );
 
     final availableHeight = mediaQuery.size.height -
         appBar.preferredSize.height -
         mediaQuery.padding.top;
 
-    return Scaffold(
-      appBar: appBar,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (!isLandscape || _showChart)
-              SizedBox(
-                height: availableHeight * (isLandscape ? 1 : 0.35),
-                child: Chart(_recentTransactions),
-              ),
-            if (!isLandscape || !_showChart)
-              _transactions.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(30.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'There is no transaction',
-                            style: TextStyle(
-                                fontSize: 15 * mediaQuery.textScaleFactor),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: SizedBox(
-                              height: 200,
-                              child: Image.asset(
-                                'assets/images/wait.png',
-                                fit: BoxFit.cover,
-                              ),
+    final body = SafeArea(
+        child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (!isLandscape || _showChart)
+            SizedBox(
+              height: availableHeight * (isLandscape ? 1 : 0.35),
+              child: Chart(_recentTransactions),
+            ),
+          if (!isLandscape || !_showChart)
+            _transactions.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'There is no transaction',
+                          style: TextStyle(
+                              fontSize: 15 * mediaQuery.textScaleFactor),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SizedBox(
+                            height: 200,
+                            child: Image.asset(
+                              'assets/images/wait.png',
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  : SizedBox(
-                      height: availableHeight * (isLandscape ? 1 : 0.65),
-                      child: TransactionList(_transactions, _removeTransaction),
+                        ),
+                      ],
                     ),
-          ],
-        ),
+                  )
+                : SizedBox(
+                    height: availableHeight * (isLandscape ? 1 : 0.65),
+                    child: TransactionList(_transactions, _removeTransaction),
+                  ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => _openTransactionFormModal(context),
-      ),
-    );
+    ));
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            navigationBar: appBar as ObstructingPreferredSizeWidget,
+            child: body,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: body,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: const Icon(Icons.add),
+                    onPressed: () => _openTransactionFormModal(context),
+                  ),
+          );
   }
 }

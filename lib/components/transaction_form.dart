@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:personal_expenses/components/adaptative_button.dart';
+import 'package:personal_expenses/components/adaptative_datepicker.dart';
+import 'package:personal_expenses/components/adaptative_textfield.dart';
 
 class TransactionForm extends StatefulWidget {
   final void Function(String title, double value, DateTime date) onSubmit;
@@ -23,23 +25,6 @@ class _TransactionFormState extends State<TransactionForm> {
     widget.onSubmit(title, value, _selectedDate as DateTime);
   }
 
-  _showDatePicket() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2019),
-      lastDate: DateTime.now(),
-    ).then((value) {
-      if (value == null) return;
-
-      setState(() {
-        _selectedDate = value;
-      });
-
-      _submitForm();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -54,48 +39,21 @@ class _TransactionFormState extends State<TransactionForm> {
           ),
           child: Column(
             children: [
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                ),
-              ),
-              TextField(
-                controller: _valueController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                onSubmitted: (_) => _submitForm(),
-                decoration: InputDecoration(
-                  labelText: 'Value ($_currencyName)',
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    _selectedDate == null
-                        ? "There is no date selected"
-                        : "Selected date ${DateFormat('d/MM/y').format(_selectedDate as DateTime)}",
-                  ),
-                  TextButton(
-                      onPressed: _showDatePicket,
-                      child: const Text(
-                        'Transaction date',
-                      )),
-                ],
-              ),
+              AdaptativeTextField(_titleController, (_) => {}, 'Title'),
+              AdaptativeTextField(
+                  _valueController,
+                  (_) => _submitForm,
+                  'Value ($_currencyName)',
+                  const TextInputType.numberWithOptions(decimal: true)),
+              AdaptativeDatePicker(_selectedDate, onDateChanged: (newDate) {
+                setState(() {
+                  _selectedDate = newDate;
+                });
+              }),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    child: const Text(
-                      'New transaction',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  AdaptativeButton('New transaction', _submitForm),
                 ],
               )
             ],
